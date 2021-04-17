@@ -36,6 +36,7 @@ function App() {
   function handleCardClick(card) {
     setSelectedCard(card);
   };
+  
   return (
     <div className="page">
       <div className="page__container">
