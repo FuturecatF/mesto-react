@@ -1,7 +1,7 @@
 import React from 'react';
 
 function ImagePopup(props) {
-    console.log(props.card.link)
+    
     return (
         <div className={`popup popup_type_image ${props.card.link ? 'popup_opened' : ''}`}>
             <figure className="photo">

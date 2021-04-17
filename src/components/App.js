@@ -36,7 +36,7 @@ function App() {
   function handleCardClick(card) {
     setSelectedCard(card);
   };
-  
+
   return (
     <div className="page">
       <div className="page__container">
@@ -49,81 +49,71 @@ function App() {
         />
         <Footer />
 
-        {isEditProfilePopupOpen ?
-          <PopupWithForm
-            title="Редактировать профиль"
-            name="edit"
-            buttonText="Сохранить"
-            isOpen={isEditProfilePopupOpen}
-            onClose={closeAllPopups}
-            children={(
-              <>
-                <input className="popup__input popup__input_type_profile-name" type="text" id="profile-name" name="name"
-                  minLength="2" maxLength="40" placeholder="Имя" required />
-                <div className="popup__error-container">
-                  <span className="popup__input-error" id="profile-name-error"></span>
-                </div>
 
-                <input className="popup__input popup__input_type_profile-job" type="text" id="profile-job" name="job"
-                  minLength="2" maxLength="200" placeholder="О себе" required />
-                <div className="popup__error-container">
-                  <span className="popup__input-error" id="profile-job-error"></span>
-                </div>
-              </>
-            )}
-          />
-          : ''}
-        {isAddPlacePopupOpen ?
-          <PopupWithForm
-            title="Новое место"
-            name="new-card"
-            buttonText="Создать"
-            isOpen={isAddPlacePopupOpen}
-            onClose={closeAllPopups}
-            children={(
-              <>
-                <input className="popup__input popup__input_type_card-name" type="text" id="card-name" name="image-name"
-                  placeholder="Название" minLength="2" maxLength="30" required />
-                <div className="popup__error-container">
-                  <span className="popup__input-error" id="card-name-error"></span>
-                </div>
-                <input className="popup__input popup__input_type_card-link" type="url" id="card-link" name="link"
-                  autoComplete="on" placeholder="Ссылка на картинку" required />
-                <div className="popup__error-container">
-                  <span className="popup__input-error" id="card-link-error"></span>
-                </div>
-              </>
-            )}
-          />
+        <PopupWithForm
+          title="Редактировать профиль"
+          name="edit"
+          buttonText="Сохранить"
+          isOpen={isEditProfilePopupOpen}
+          onClose={closeAllPopups}
+        >
+          <input className="popup__input popup__input_type_profile-name" type="text" id="profile-name" name="name"
+            minLength="2" maxLength="40" placeholder="Имя" required />
+          <div className="popup__error-container">
+            <span className="popup__input-error" id="profile-name-error"></span>
+          </div>
 
-          : ''}
-        {isEditAvatarPopupOpen ?
-          <PopupWithForm
-            title="Обновить аватар"
-            name="avatar"
-            buttonText="Сохранить"
-            isOpen={isEditAvatarPopupOpen}
-            onClose={closeAllPopups}
-            children={(
-              <>
-                <input className="popup__input popup__input_type_avatar-link" type="url" id="avatar-link" name="avatar-image"
-                  autoComplete="on" placeholder="Ссылка на картинку" required />
-                <div className="popup__error-container">
-                  <span className="popup__input-error" id="avatar-link-error"></span>
-                </div>
-              </>
-            )}
-          />
+          <input className="popup__input popup__input_type_profile-job" type="text" id="profile-job" name="job"
+            minLength="2" maxLength="200" placeholder="О себе" required />
+          <div className="popup__error-container">
+            <span className="popup__input-error" id="profile-job-error"></span>
+          </div>
+        </PopupWithForm>
 
-          : ''}
-        {selectedCard.link ?
-          <ImagePopup
-            card={selectedCard}
-            onClose={closeAllPopups}
-          />
-          : ''}
 
-              {/* // на будущее */}
+
+        <PopupWithForm
+          title="Новое место"
+          name="new-card"
+          buttonText="Создать"
+          isOpen={isAddPlacePopupOpen}
+          onClose={closeAllPopups}
+        >
+          <input className="popup__input popup__input_type_card-name" type="text" id="card-name" name="image-name"
+            placeholder="Название" minLength="2" maxLength="30" required />
+          <div className="popup__error-container">
+            <span className="popup__input-error" id="card-name-error"></span>
+          </div>
+          <input className="popup__input popup__input_type_card-link" type="url" id="card-link" name="link"
+            autoComplete="on" placeholder="Ссылка на картинку" required />
+          <div className="popup__error-container">
+            <span className="popup__input-error" id="card-link-error"></span>
+          </div>
+        </PopupWithForm>
+
+
+        <PopupWithForm
+          title="Обновить аватар"
+          name="avatar"
+          buttonText="Сохранить"
+          isOpen={isEditAvatarPopupOpen}
+          onClose={closeAllPopups}
+        >
+          <input className="popup__input popup__input_type_avatar-link" type="url" id="avatar-link" name="avatar-image"
+            autoComplete="on" placeholder="Ссылка на картинку" required />
+          <div className="popup__error-container">
+            <span className="popup__input-error" id="avatar-link-error"></span>
+          </div>
+        </PopupWithForm>
+
+        <ImagePopup
+          card={selectedCard}
+          onClose={closeAllPopups}
+        >
+        </ImagePopup>
+
+
+        {/* // на будущее */}
         {/*  <div className="popup popup_type_submit">
           <div className="popup__container">
             <h2 className="popup__title">Вы уверены?</h2>
@@ -134,7 +124,7 @@ function App() {
           </div>
         </div>*/}
       </div>
-    </div>  
+    </div>
 
   );
 }
