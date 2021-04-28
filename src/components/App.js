@@ -3,15 +3,47 @@ import '../index.css';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
-import PopupWithForm from './PopupWithForm.js'
 import ImagePopup from './ImagePopup.js';
+import { api } from '../utils/api.js';
+import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
+import EditProfilePopup from './EditProfilePopup';
+import EditAvatarPopup from './EditAvatarPopup';
+import AddPlacePopup from './AddPlacePopup';
+import ConfirmPopup from './ConfirmPopup';
+
+
 
 function App() {
 
   const [isEditProfilePopupOpen, setEditProfileClick] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlaceClick] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarClick] = React.useState(false);
+  const [isConfirmPopupOpen, setConfirmClick] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({});
+  const [currentUser, setCurrentUser] = React.useState([]);
+  const [cards, setInitialCards] = React.useState([]);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [deletedCard, setDeletedCard] = React.useState({});
+
+
+  React.useEffect(() => {
+    Promise.all([api.getUserProfile(), api.getInitialCards()])
+      .then(([data, cards]) => {
+        setCurrentUser(data);
+        setInitialCards(cards);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  function handleCardLike(card) {
+
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
+      setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+    });
+  }
 
   function handleEditAvatarClick() {
     setEditAvatarClick(true);
@@ -30,102 +62,113 @@ function App() {
     setEditProfileClick(false);
     setAddPlaceClick(false);
     setEditAvatarClick(false);
+    setConfirmClick(false);
     setSelectedCard({});
+    setDeletedCard({});
   };
 
   function handleCardClick(card) {
     setSelectedCard(card);
   };
 
+  function handleDeleteClick(card) {
+    setConfirmClick(true);
+    setDeletedCard(card);
+  };
+
+
+  function handleCardDelete() {
+    setIsSaving(true);
+    api.deleteCard(deletedCard._id)
+    
+      .then(() => {
+        const newCards = cards.filter((c) => c._id !== deletedCard._id);
+        setInitialCards(newCards);
+      })
+      .catch(err => console.log(err))
+      .then(() => closeAllPopups())
+      .finally(() => setIsSaving(false))
+  };
+
+  function handleUpdateUser(data) {
+    setIsSaving(true);
+    api.setUserProfile(data)
+      .then((data) => setCurrentUser(data))
+      .catch(err => console.log(err))
+      .then(() => closeAllPopups())
+      .finally(() => setIsSaving(false))
+  };
+
+  function handleUpdateAvatar(avatar) {
+    setIsSaving(true);
+    api.setUserAvatar(avatar)
+      .then((avatar) => setCurrentUser(avatar))
+      .catch(err => console.log(err))
+      .then(() => closeAllPopups())
+      .finally(() => setIsSaving(false))
+  };
+
+  function handleAddPlaceSubmit(card) {
+    setIsSaving(true);
+    api.postNewCard(card)
+      .then((card) => setInitialCards([card, ...cards]))
+      .catch(err => console.log(err))
+      .then(() => closeAllPopups())
+      .finally(() => setIsSaving(false))
+  };
+
   return (
     <div className="page">
       <div className="page__container">
-        <Header />
-        <Main
-          onEditAvatar={handleEditAvatarClick}
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onCardClick={handleCardClick}
-        />
-        <Footer />
+        <CurrentUserContext.Provider value={currentUser}>
+          <Header />
+          <Main
+            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            cards={cards}
+            onCardLike={handleCardLike}
+            onCardDelete={handleDeleteClick}
+            onCardClick={handleCardClick}
+          />
+          <Footer />
 
+          <EditProfilePopup
+            isOpen={isEditProfilePopupOpen}
+            onClose={closeAllPopups}
+            onUpdateUser={handleUpdateUser}
+            isSaving={isSaving}
+          />
 
-        <PopupWithForm
-          title="Редактировать профиль"
-          name="edit"
-          buttonText="Сохранить"
-          isOpen={isEditProfilePopupOpen}
-          onClose={closeAllPopups}
-        >
-          <input className="popup__input popup__input_type_profile-name" type="text" id="profile-name" name="name"
-            minLength="2" maxLength="40" placeholder="Имя" required />
-          <div className="popup__error-container">
-            <span className="popup__input-error" id="profile-name-error"></span>
-          </div>
+          <AddPlacePopup
+            isOpen={isAddPlacePopupOpen}
+            onClose={closeAllPopups}
+            onAddPlace={handleAddPlaceSubmit}
+            isSaving={isSaving}
+          />
 
-          <input className="popup__input popup__input_type_profile-job" type="text" id="profile-job" name="job"
-            minLength="2" maxLength="200" placeholder="О себе" required />
-          <div className="popup__error-container">
-            <span className="popup__input-error" id="profile-job-error"></span>
-          </div>
-        </PopupWithForm>
+          <EditAvatarPopup
+            isOpen={isEditAvatarPopupOpen}
+            onClose={closeAllPopups}
+            onUpdateAvatar={handleUpdateAvatar}
+            isSaving={isSaving}
+          />
 
+          <ImagePopup
+            card={selectedCard}
+            onClose={closeAllPopups}
+          />
+          
 
-
-        <PopupWithForm
-          title="Новое место"
-          name="new-card"
-          buttonText="Создать"
-          isOpen={isAddPlacePopupOpen}
-          onClose={closeAllPopups}
-        >
-          <input className="popup__input popup__input_type_card-name" type="text" id="card-name" name="image-name"
-            placeholder="Название" minLength="2" maxLength="30" required />
-          <div className="popup__error-container">
-            <span className="popup__input-error" id="card-name-error"></span>
-          </div>
-          <input className="popup__input popup__input_type_card-link" type="url" id="card-link" name="link"
-            autoComplete="on" placeholder="Ссылка на картинку" required />
-          <div className="popup__error-container">
-            <span className="popup__input-error" id="card-link-error"></span>
-          </div>
-        </PopupWithForm>
-
-
-        <PopupWithForm
-          title="Обновить аватар"
-          name="avatar"
-          buttonText="Сохранить"
-          isOpen={isEditAvatarPopupOpen}
-          onClose={closeAllPopups}
-        >
-          <input className="popup__input popup__input_type_avatar-link" type="url" id="avatar-link" name="avatar-image"
-            autoComplete="on" placeholder="Ссылка на картинку" required />
-          <div className="popup__error-container">
-            <span className="popup__input-error" id="avatar-link-error"></span>
-          </div>
-        </PopupWithForm>
-
-        <ImagePopup
-          card={selectedCard}
-          onClose={closeAllPopups}
-        >
-        </ImagePopup>
-
-
-        {/* // на будущее */}
-        {/*  <div className="popup popup_type_submit">
-          <div className="popup__container">
-            <h2 className="popup__title">Вы уверены?</h2>
-            <form className="popup__form" name="popup-form">
-              <button className="popup__button popup__button_type_yes" type="submit">Да</button>
-            </form>
-            <button className="popup__close" type="button" aria-label="Закрыть форму"></button>
-          </div>
-        </div>*/}
+          <ConfirmPopup
+            isOpen={isConfirmPopupOpen}
+            onClose={closeAllPopups}
+            onConfirm={handleCardDelete}
+            isSaving={isSaving}
+          />
+        </CurrentUserContext.Provider>
       </div>
-    </div>
-
+      </div>
   );
 }
 

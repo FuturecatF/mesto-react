@@ -23,10 +23,7 @@ class Api {
         return fetch(`${this._baseUrl}/cards`, {
             method: 'POST',
             headers: this._headers,
-            body: JSON.stringify({
-                name: data.name,
-                link: data.link
-            }),
+            body: JSON.stringify(data),
         })
             .then(this._getResponseData)
     }
@@ -43,10 +40,7 @@ class Api {
         return fetch(`${this._baseUrl}/users/me`, {
             method: 'PATCH',
             headers: this._headers,
-            body: JSON.stringify({
-                name: data.name,
-                about: data.about
-            })
+            body: JSON.stringify(data)
         })
             .then(this._getResponseData)
     }
@@ -59,29 +53,27 @@ class Api {
             .then(this._getResponseData)
     }
 
-    putLikeCard(cardId) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-            method: 'PUT',
-            headers: this._headers
-        })
-            .then(this._getResponseData)
+    changeLikeCardStatus(id, isLiked) {
+        if (isLiked) {
+            return fetch(`${this._baseUrl}/cards/likes/${id}`, {
+                method: "PUT",
+                headers: this._headers
+            })
+                .then(this._getResponseData)
+        } else {
+            return fetch(`${this._baseUrl}/cards/likes/${id}`, {
+                method: "DELETE",
+                headers: this._headers
+            })
+                .then(this._getResponseData)
+        }
     }
 
-    deleteLikeCard(cardId) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-            method: 'DELETE',
-            headers: this._headers
-        })
-            .then(this._getResponseData)
-    }
-
-    setUserAvatar(data) {
+    setUserAvatar(avatar) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             method: 'PATCH',
             headers: this._headers,
-            body: JSON.stringify({
-                avatar: data.avatar
-            })
+            body: JSON.stringify(avatar)
         })
             .then(this._getResponseData)
     }
