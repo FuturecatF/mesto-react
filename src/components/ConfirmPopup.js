@@ -1,10 +1,10 @@
 import React from 'react';
 import PopupWithForm from './PopupWithForm';
 
-function ConfirmPopup(props) {
+function ConfirmPopup({ isOpen, onClose, isSaving, onConfirm }) {
     function handleSubmit(e) {
       e.preventDefault();
-      props.onConfirm();
+      onConfirm();
 
     };
   
@@ -13,10 +13,10 @@ function ConfirmPopup(props) {
       title="Вы уверены?"
       name="submit"
       buttonText="Да"
-        isOpen={props.isOpen}
-        onClose={props.onClose}
+        isOpen={isOpen}
+        onClose={onClose}
         onSubmit={handleSubmit}
-        isSaving={props.isSaving}
+        isSaving={isSaving}
     />
     )
   }

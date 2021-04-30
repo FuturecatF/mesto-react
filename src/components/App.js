@@ -23,6 +23,9 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState([]);
   const [cards, setInitialCards] = React.useState([]);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+
+
   const [deletedCard, setDeletedCard] = React.useState({});
 
 
@@ -78,44 +81,68 @@ function App() {
 
 
   function handleCardDelete() {
+
     setIsSaving(true);
+
     api.deleteCard(deletedCard._id)
-    
+
       .then(() => {
-        const newCards = cards.filter((c) => c._id !== deletedCard._id);
-        setInitialCards(newCards);
+        setInitialCards(cards => cards.filter((c) => c._id !== deletedCard._id));
       })
-      .catch(err => console.log(err))
       .then(() => closeAllPopups())
-      .finally(() => setIsSaving(false))
+      .catch(err => console.log(err))
+      .finally(() => {
+
+        setIsSaving(false)
+
+      })
   };
 
   function handleUpdateUser(data) {
+
     setIsSaving(true);
     api.setUserProfile(data)
       .then((data) => setCurrentUser(data))
-      .catch(err => console.log(err))
       .then(() => closeAllPopups())
-      .finally(() => setIsSaving(false))
+      .catch(err => console.log(err))
+      .finally(() => {
+
+        setIsSaving(false)
+
+      })
   };
 
   function handleUpdateAvatar(avatar) {
+
     setIsSaving(true);
     api.setUserAvatar(avatar)
       .then((avatar) => setCurrentUser(avatar))
-      .catch(err => console.log(err))
       .then(() => closeAllPopups())
-      .finally(() => setIsSaving(false))
+      .catch(err => console.log(err))
+      .finally(() => {
+
+        setIsSaving(false)
+
+      })
   };
 
   function handleAddPlaceSubmit(card) {
+    /* setDisabled(true); */
     setIsSaving(true);
+
+    if (isSaving) {
+      setDisabled(true);
+    }
+
     api.postNewCard(card)
+
       .then((card) => setInitialCards([card, ...cards]))
-      .catch(err => console.log(err))
       .then(() => closeAllPopups())
+      .catch(err => console.log(err))
       .finally(() => setIsSaving(false))
+
   };
+
 
   return (
     <div className="page">
@@ -145,6 +172,8 @@ function App() {
             onClose={closeAllPopups}
             onAddPlace={handleAddPlaceSubmit}
             isSaving={isSaving}
+            disabled={disabled}
+
           />
 
           <EditAvatarPopup
@@ -158,7 +187,7 @@ function App() {
             card={selectedCard}
             onClose={closeAllPopups}
           />
-          
+
 
           <ConfirmPopup
             isOpen={isConfirmPopupOpen}
@@ -168,7 +197,7 @@ function App() {
           />
         </CurrentUserContext.Provider>
       </div>
-      </div>
+    </div>
   );
 }
 

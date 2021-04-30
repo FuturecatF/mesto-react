@@ -17,8 +17,8 @@ function AddPlacePopup(props) {
         e.preventDefault();
 
         props.onAddPlace({
-            name: name || '',
-            link: image || '',
+            name: name,
+            link: image,
         });
     };
 
@@ -30,6 +30,7 @@ function AddPlacePopup(props) {
             isOpen={props.isOpen}
             onClose={props.onClose}
             isSaving={props.isSaving}
+            disabled={props.disabled}
             onSubmit={handleSubmit}
         >
             <input onChange={handleChangeName} className="popup__input popup__input_type_card-name" type="text" id="card-name" name="image-name"
