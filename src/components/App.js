@@ -1,20 +1,17 @@
-import React from 'react';
-import '../index.css';
-import Header from './Header.js';
-import Main from './Main.js';
-import Footer from './Footer.js';
-import ImagePopup from './ImagePopup.js';
-import { api } from '../utils/api.js';
-import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
-import EditProfilePopup from './EditProfilePopup';
-import EditAvatarPopup from './EditAvatarPopup';
-import AddPlacePopup from './AddPlacePopup';
-import ConfirmPopup from './ConfirmPopup';
-
-
+import React from "react";
+import "../index.css";
+import Header from "./Header.js";
+import Main from "./Main.js";
+import Footer from "./Footer.js";
+import ImagePopup from "./ImagePopup.js";
+import { api } from "../utils/api.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
+import EditProfilePopup from "./EditProfilePopup";
+import EditAvatarPopup from "./EditAvatarPopup";
+import AddPlacePopup from "./AddPlacePopup";
+import ConfirmPopup from "./ConfirmPopup";
 
 function App() {
-
   const [isEditProfilePopupOpen, setEditProfileClick] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlaceClick] = React.useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarClick] = React.useState(false);
@@ -23,11 +20,7 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState([]);
   const [cards, setInitialCards] = React.useState([]);
   const [isSaving, setIsSaving] = React.useState(false);
-  const [disabled, setDisabled] = React.useState(false);
-
-
   const [deletedCard, setDeletedCard] = React.useState({});
-
 
   React.useEffect(() => {
     Promise.all([api.getUserProfile(), api.getInitialCards()])
@@ -41,10 +34,11 @@ function App() {
   }, []);
 
   function handleCardLike(card) {
-
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i._id === currentUser._id);
     api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-      setInitialCards((state) => state.map((c) => c._id === card._id ? newCard : c));
+      setInitialCards((state) =>
+        state.map((c) => (c._id === card._id ? newCard : c))
+      );
     });
   }
 
@@ -55,7 +49,6 @@ function App() {
   function handleEditProfileClick() {
     setEditProfileClick(true);
   }
-
 
   function handleAddPlaceClick() {
     setAddPlaceClick(true);
@@ -68,85 +61,66 @@ function App() {
     setConfirmClick(false);
     setSelectedCard({});
     setDeletedCard({});
-  };
+  }
 
   function handleCardClick(card) {
     setSelectedCard(card);
-  };
+  }
 
   function handleDeleteClick(card) {
     setConfirmClick(true);
     setDeletedCard(card);
-  };
-
+  }
 
   function handleCardDelete() {
-
     setIsSaving(true);
 
-    api.deleteCard(deletedCard._id)
+    api
+      .deleteCard(deletedCard._id)
 
       .then(() => {
-        setInitialCards(cards => cards.filter((c) => c._id !== deletedCard._id));
+        setInitialCards((cards) =>
+          cards.filter((c) => c._id !== deletedCard._id)
+        );
       })
       .then(() => closeAllPopups())
-      .catch(err => console.log(err))
-      .finally(() => {
-
-        setIsSaving(false)
-
-      })
-  };
+      .catch((err) => console.log(err))
+      .finally(() => setIsSaving(false));
+  }
 
   function handleUpdateUser(data) {
-
     setIsSaving(true);
-    api.setUserProfile(data)
+    api
+      .setUserProfile(data)
       .then((data) => setCurrentUser(data))
       .then(() => closeAllPopups())
-      .catch(err => console.log(err))
-      .finally(() => {
-
-        setIsSaving(false)
-
-      })
-  };
+      .catch((err) => console.log(err))
+      .finally(() => setIsSaving(false));
+  }
 
   function handleUpdateAvatar(avatar) {
-
     setIsSaving(true);
-    api.setUserAvatar(avatar)
+    api
+      .setUserAvatar(avatar)
       .then((avatar) => setCurrentUser(avatar))
       .then(() => closeAllPopups())
-      .catch(err => console.log(err))
-      .finally(() => {
-
-        setIsSaving(false)
-
-      })
-  };
+      .catch((err) => console.log(err))
+      .finally(() => setIsSaving(false));
+  }
 
   function handleAddPlaceSubmit(card) {
-    /* setDisabled(true); */
     setIsSaving(true);
-
-    if (isSaving) {
-      setDisabled(true);
-    }
-
-    api.postNewCard(card)
-
+    api
+      .postNewCard(card)
       .then((card) => setInitialCards([card, ...cards]))
       .then(() => closeAllPopups())
-      .catch(err => console.log(err))
-      .finally(() => setIsSaving(false))
-
-  };
-
+      .catch((err) => console.log(err))
+      .finally(() => setIsSaving(false));
+  }
 
   return (
-    <div className="page">
-      <div className="page__container">
+    <div className='page'>
+      <div className='page__container'>
         <CurrentUserContext.Provider value={currentUser}>
           <Header />
           <Main
@@ -172,8 +146,6 @@ function App() {
             onClose={closeAllPopups}
             onAddPlace={handleAddPlaceSubmit}
             isSaving={isSaving}
-            disabled={disabled}
-
           />
 
           <EditAvatarPopup
@@ -183,11 +155,7 @@ function App() {
             isSaving={isSaving}
           />
 
-          <ImagePopup
-            card={selectedCard}
-            onClose={closeAllPopups}
-          />
-
+          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
 
           <ConfirmPopup
             isOpen={isConfirmPopupOpen}
